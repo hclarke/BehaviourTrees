@@ -14,7 +14,7 @@ public class PingPongBehaviour : BehaviourTreeRoot {
         return (moveToPing & moveToPong).Loop();
     }
 
-    StaticBehaviourTree MoveToward(Func<GameObject, Vector3> getTarget) {
+    StaticBehaviourTree MoveToward(Func<BehaviourTreeRoot, Vector3> getTarget) {
         return StaticBehaviourTree.Create(obj => {
             var target = getTarget(obj);
             var pos = obj.transform.position;

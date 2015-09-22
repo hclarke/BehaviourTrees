@@ -20,7 +20,7 @@ public abstract class BehaviourTreeRoot : MonoBehaviour {
     protected abstract StaticBehaviourTree GetBehaviourTree();
 
     void Update() {
-        tree.Run(gameObject, ref state);
+        tree.Run(this, ref state);
         current = tree.GetNode(state).ToString() ;
     }
 }

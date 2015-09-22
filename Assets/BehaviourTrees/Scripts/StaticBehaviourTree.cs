@@ -16,8 +16,8 @@ public abstract class StaticBehaviourTree {
 
     public string name;
 
-    public Func<GameObject, BehaviourStatus, int, bool> Guard;
-    public abstract void Run(GameObject obj, ref BehaviourStatus status, ref int state);
+    public Func<BehaviourTreeRoot, BehaviourStatus, int, bool> Guard;
+    public abstract void Run(BehaviourTreeRoot obj, ref BehaviourStatus status, ref int state);
     public virtual StaticBehaviourTree[] Children {
         get {
             return new StaticBehaviourTree[0];
@@ -49,14 +49,14 @@ public abstract class StaticBehaviourTree {
     public LoopNode Loop() {
         return new LoopNode(this);
     }
-    public static ActionNode Create(Action<GameObject> action, string name = null) {
+    public static ActionNode Create(Action<BehaviourTreeRoot> action, string name = null) {
         var node = new ActionNode(action);
 
         node.name = name;
         return node;
     }
 
-    public static ConditionNode Create(Func<GameObject, bool> condition, string name = null) {
+    public static ConditionNode Create(Func<BehaviourTreeRoot, bool> condition, string name = null) {
         var node = new ConditionNode(condition);
         node.name = name;
         return node;
@@ -66,7 +66,7 @@ public abstract class StaticBehaviourTree {
         return new ForceTrueNode(this);
     }
 
-    public LoopNode While(Func<GameObject, bool> condition) {
+    public LoopNode While(Func<BehaviourTreeRoot, bool> condition) {
         return (Create(condition) & this.ForceTrue()).Loop();
     }
 
@@ -94,7 +94,7 @@ public struct BehaviourState {
 
 public class CompiledBehaviourTree {
     struct GuardReturn {
-        public Func<GameObject, BehaviourStatus, int, bool> guard;
+        public Func<BehaviourTreeRoot, BehaviourStatus, int, bool> guard;
         public int returnTo;
         public int state;
     }
@@ -106,7 +106,7 @@ public class CompiledBehaviourTree {
         public int[] children;
     }
     class RootNode : StaticBehaviourTree {
-        public override void Run(GameObject obj, ref BehaviourStatus status, ref int state) {
+        public override void Run(BehaviourTreeRoot obj, ref BehaviourStatus status, ref int state) {
             if (status == BehaviourStatus.Fail) {
                 Debug.LogError("root node failed!");
             }
@@ -160,7 +160,7 @@ public class CompiledBehaviourTree {
         return idx;        
     }
 
-    public void Run(GameObject obj, ref BehaviourState stack) {
+    public void Run(BehaviourTreeRoot obj, ref BehaviourState stack) {
     StepStart:
         var idx = stack.nodeIndex;
         var node = states[idx];
